@@ -8,5 +8,6 @@ class TrackerConfig(AppConfig):
 
     DEFAULT_CRYPTO = 'BTC'
     DEFAULT_FIAT = 'USD'
+    EXCHANGES = ["Binance"]
 
 

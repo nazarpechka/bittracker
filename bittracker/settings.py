@@ -126,5 +126,6 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Crypto rates API key (CoinMarketCap or other supported)
-RATES_API_KEY = "49ebcb1f-8c83-4b07-8a1d-d5467bd845be"
+# CoinMarketCap info
+COINMARKETCAP_URL = 'https://pro-api.coinmarketcap.com/v1'
+COINMARKETCAP_KEY = '49ebcb1f-8c83-4b07-8a1d-d5467bd845be'

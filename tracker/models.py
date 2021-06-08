@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .apps import TrackerConfig
+from .api.CoinMarketCap import CoinMarketCap
 
 
 class Crypto(models.Model):
     """Defines cryptocurrencies which can be used in tracker"""
-    name = models.CharField(max_length=10, primary_key=True)
+    symbol = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length=32)
 
     def __str__(self):
         return self.name
@@ -14,7 +15,8 @@ class Crypto(models.Model):
 
 class Fiat(models.Model):
     """Defines fiat currencies which can be used in tracker"""
-    name = models.CharField(max_length=10, primary_key=True)
+    symbol = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length=32)
 
     def __str__(self):
         return self.name
@@ -78,3 +80,23 @@ class ManualBalance(Balance):
         return f"{self.user.username}: {super().__str__()}"
 
 
+def refresh_rates():
+    cmc = CoinMarketCap()
+
+    fiats = Fiat.objects.all()
+    cryptos = Crypto.objects.all()
+
+    for fiat in fiats:
+        rates = cmc.get_crypto_rates(fiat.symbol)
+        for crypto in cryptos:
+            if crypto.symbol in rates:
+                created_rate, _ = Rate.objects.get_or_create(
+                    crypto=crypto,
+                    fiat=fiat,
+                    rate=rates[crypto.symbol]
+                )
+                created_rate.save()
+
+
+def refresh_balances():
+    pass

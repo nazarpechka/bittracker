@@ -1,3 +1,9 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+from .api.CoinMarketCap import CoinMarketCap
+
+
+def index(request):
+    cmc = CoinMarketCap()
+    return HttpResponse(cmc.get_crypto_rates("UAH"))
