@@ -126,6 +126,14 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CoinMarketCap info
+# Minimum balance to be tracked
+MIN_BALANCE = 0.00001
+
+# CoinMarketCap settings
 COINMARKETCAP_URL = 'https://pro-api.coinmarketcap.com/v1'
 COINMARKETCAP_KEY = '49ebcb1f-8c83-4b07-8a1d-d5467bd845be'
+
+# Binance settings
+BINANCE_URL = 'https://api.binance.com'
+BINANCE_TIME = '/api/v1/time'
+BINANCE_WALLET = '/sapi/v1/capital/config/getall'

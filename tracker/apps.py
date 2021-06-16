@@ -6,8 +6,4 @@ class TrackerConfig(AppConfig):
     name = 'tracker'
     verbose_name = 'Cryptocurrency portfolio tracker'
 
-    DEFAULT_CRYPTO = 'BTC'
-    DEFAULT_FIAT = 'USD'
-    EXCHANGES = ["Binance"]
-
 

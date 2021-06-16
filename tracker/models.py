@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from .api.APIFactory import APIFactory
 from .api.CoinMarketCap import CoinMarketCap
 
 
@@ -21,6 +22,13 @@ class Fiat(models.Model):
     def __str__(self):
         return self.name
 
+class UserAccount(models.Model):
+    """Defines user account in the application"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} - {self.fiat}"
 
 class Rate(models.Model):
     """Defines conversion rate between cryptocurrency and fiat"""
@@ -42,19 +50,19 @@ class Exchange(models.Model):
 
 class ExchangeAccount(models.Model):
     """Defines a specific exchange account with API key"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     key = models.CharField(max_length=1024)
     secret = models.CharField(max_length=1024)
 
     def __str__(self):
-        return f"{self.exchange}[{self.user.username}]"
+        return f"{self.exchange}[{self.user.user}]"
 
 
 class Balance(models.Model):
     """Defines balance of cryptocurrency user owns"""
     crypto = models.ForeignKey(Crypto, on_delete=models.CASCADE)
-    amount = models.FloatField()
+    amount = models.FloatField(null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -74,10 +82,10 @@ class ExchangeBalance(Balance):
 
 class ManualBalance(Balance):
     """Defines balance of cryptocurrency from manual user input"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.username}: {super().__str__()}"
+        return f"{self.user}: {super().__str__()}"
 
 
 def refresh_rates():
@@ -99,4 +107,22 @@ def refresh_rates():
 
 
 def refresh_balances():
-    pass
+    accounts = ExchangeAccount.objects.all()
+
+    for account in accounts:
+        api = APIFactory.create(account)
+        balance = api.get_balance()
+
+        for symbol, amount in balance.items():
+            crypto, _ = Crypto.objects.get_or_create(symbol=symbol)
+            exchange_balance, _ = ExchangeBalance.objects.get_or_create(exchange_account=account, crypto=crypto)
+            exchange_balance.amount = amount
+            exchange_balance.save()
+
+        for exchange_balance in ExchangeBalance.objects.all():
+            if exchange_balance.crypto.symbol not in balance:
+                exchange_balance.delete()
+
+
+
+
