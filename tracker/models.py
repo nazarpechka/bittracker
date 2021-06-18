@@ -22,6 +22,7 @@ class Fiat(models.Model):
     def __str__(self):
         return self.name
 
+
 class UserAccount(models.Model):
     """Defines user account in the application"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,6 +30,7 @@ class UserAccount(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.fiat}"
+
 
 class Rate(models.Model):
     """Defines conversion rate between cryptocurrency and fiat"""
@@ -88,6 +90,38 @@ class ManualBalance(Balance):
         return f"{self.user}: {super().__str__()}"
 
 
+def get_user_balance(user):
+    total_balance = {}
+    exchange_accounts = ExchangeAccount.objects.filter(user=user)
+    exchange_balances = ExchangeBalance.objects.filter(exchange_account__in=exchange_accounts)
+    manual_balances = ManualBalance.objects.filter(user=user)
+    balances = exchange_balances.union(manual_balances)
+
+    user_fiat = user.fiat
+
+    for balance in balances:
+        crypto = balance.crypto
+        amount = balance.amount
+        try:
+            rate = Rate.objects.get(crypto=crypto, fiat=user_fiat)
+            amount_fiat = rate.rate * amount
+        except (Rate.DoesNotExist, TypeError):
+            amount_fiat = 0
+
+        if amount is None:
+            continue
+        if crypto in total_balance:
+            total_balance[crypto]['amount'] += amount
+            total_balance[crypto]['amount_fiat'] += amount_fiat
+        else:
+            total_balance[crypto] = {
+                'amount': amount,
+                'amount_fiat': amount_fiat
+            }
+
+    return total_balance
+
+
 def refresh_rates():
     cmc = CoinMarketCap()
 
@@ -122,7 +156,3 @@ def refresh_balances():
         for exchange_balance in ExchangeBalance.objects.all():
             if exchange_balance.crypto.symbol not in balance:
                 exchange_balance.delete()
-
-
-
-

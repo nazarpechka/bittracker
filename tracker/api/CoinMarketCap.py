@@ -28,7 +28,7 @@ class CoinMarketCap:
     def get_crypto_list(self):
         parameters = {
             'start': '1',
-            'limit': '150',
+            'limit': settings.COINMARKETCAP_LIMIT,
         }
         response = self.__request('/cryptocurrency/map', parameters)["data"]
         cryptos = {}
@@ -39,7 +39,7 @@ class CoinMarketCap:
     def get_fiat_list(self):
         parameters = {
             'start': '1',
-            'limit': '20',
+            'limit': '300',
         }
         response = self.__request('/fiat/map', parameters)["data"]
         fiats = {}
@@ -50,7 +50,7 @@ class CoinMarketCap:
     def get_crypto_rates(self, fiat):
         parameters = {
             'start': '1',
-            'limit': '150',
+            'limit': settings.COINMARKETCAP_LIMIT,
             'convert': fiat
         }
         response = self.__request('/cryptocurrency/listings/latest', parameters)["data"]
