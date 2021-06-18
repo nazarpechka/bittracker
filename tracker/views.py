@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import get_user_balance, UserAccount
+from .models import get_user_balance, UserProfile
 
 
 def home(request):
@@ -9,7 +9,7 @@ def home(request):
 
 
 def portfolio(request):
-    user = UserAccount.objects.get(user=request.user)
+    user = UserProfile.objects.get(user=request.user)
     balance = get_user_balance(user)
     holdings = 0
     for val in balance.values():

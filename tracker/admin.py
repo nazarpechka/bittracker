@@ -4,7 +4,7 @@ from .models import *
 
 admin.site.register(Crypto)
 admin.site.register(Fiat)
-admin.site.register(UserAccount)
+admin.site.register(UserProfile)
 admin.site.register(Rate)
 admin.site.register(Exchange)
 admin.site.register(ExchangeAccount)

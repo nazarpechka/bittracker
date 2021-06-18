@@ -23,7 +23,7 @@ class Fiat(models.Model):
         return self.name
 
 
-class UserAccount(models.Model):
+class UserProfile(models.Model):
     """Defines user account in the application"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE)
@@ -52,7 +52,7 @@ class Exchange(models.Model):
 
 class ExchangeAccount(models.Model):
     """Defines a specific exchange account with API key"""
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     key = models.CharField(max_length=1024)
     secret = models.CharField(max_length=1024)
@@ -84,7 +84,7 @@ class ExchangeBalance(Balance):
 
 class ManualBalance(Balance):
     """Defines balance of cryptocurrency from manual user input"""
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user}: {super().__str__()}"
