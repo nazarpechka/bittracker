@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.conf import settings
 
 from .api.APIFactory import APIFactory
 from .api.CoinMarketCap import CoinMarketCap
@@ -25,8 +26,8 @@ class Fiat(models.Model):
 
 class UserProfile(models.Model):
     """Defines user account in the application"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"{self.user} - {self.fiat}"

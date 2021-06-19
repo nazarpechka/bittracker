@@ -24,6 +24,8 @@ SECRET_KEY = 'django-insecure-w^4&ow(y$u^ho%%n*@p3ciyzws8g!0ci2670b8ty!1#c00(pv*
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# For password reset testing
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
@@ -74,7 +76,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bittracker.wsgi.application'
 
-
+LOGIN_REDIRECT_URL = 'portfolio'
+LOGOUT_REDIRECT_URL = 'home'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -103,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

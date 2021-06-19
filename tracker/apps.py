@@ -6,4 +6,6 @@ class TrackerConfig(AppConfig):
     name = 'tracker'
     verbose_name = 'Cryptocurrency portfolio tracker'
 
+    def ready(self):
+        import tracker.signals
 
