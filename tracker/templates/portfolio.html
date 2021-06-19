@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h1>Your Portfolio</h1>
     <div class="table__wrapper">
         <div class="title-block">
             <div class="title-text"><strong>Cryptocurrency holdings:</strong></div>
             <div class="_35px-hor-space"></div>
             <div class="title-text">{{ holdings }}</div>
             <div class="_5px-hor-space"></div>
-            <div class="title-text">USD</div>
+            <div class="title-text">{{ fiat_symbol }}</div>
         </div>
         <div class="table-point">
             <div class="column">
@@ -17,7 +18,7 @@
                 <div class="title-text"><strong>Amount</strong></div>
             </div>
             <div class="column">
-                <div class="title-text"><strong>Amount in USD</strong></div>
+                <div class="title-text"><strong>Amount in {{ fiat_symbol }}</strong></div>
             </div>
         </div>
         {% for crypto, data in balance.items %}

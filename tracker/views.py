@@ -2,11 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login, authenticate
 from django.shortcuts import render, redirect
 
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-import numpy as np
-
 from .forms import SignUpForm
 from .models import get_user_balance, UserProfile
 
@@ -18,6 +13,7 @@ def home(request):
 @login_required
 def portfolio(request):
     user = UserProfile.objects.get(user=request.user)
+    fiat_symbol = user.fiat.symbol
     balance = get_user_balance(user)
     holdings = 0
     amounts_fiat = []
@@ -28,7 +24,13 @@ def portfolio(request):
     symbols = [crypto.symbol for crypto in list(balance.keys())]
 
     colors = ['#114B5F', '#1A936F', '#88D498', '#C6DABF', '#F3E9D2', '#EF5B5B', '#20A39E', '#FFBA49']
-    return render(request, 'portfolio.html', context={'balance': balance, 'holdings': holdings, 'amounts_fiat': amounts_fiat, 'symbols':symbols, 'colors':colors})
+    context = {'balance': balance,
+               'fiat_symbol': fiat_symbol,
+               'holdings': holdings,
+               'amounts_fiat': amounts_fiat,
+               'symbols': symbols,
+               'colors': colors}
+    return render(request, 'portfolio.html', context)
 
 
 @login_required
