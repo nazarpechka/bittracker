@@ -30,7 +30,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
                  '10.211.55.8',
-                 'bittracker.com']
+                 'bittracker.com',
+                 'np252609.local'] # For linux assignment
 
 
 # Application definition
