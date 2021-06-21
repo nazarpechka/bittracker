@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.conf import settings
 
 from .api.APIFactory import APIFactory
 from .api.CoinMarketCap import CoinMarketCap
@@ -37,7 +36,7 @@ class Rate(models.Model):
     """Defines conversion rate between cryptocurrency and fiat"""
     crypto = models.ForeignKey(Crypto, on_delete=models.CASCADE)
     fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE)
-    rate = models.FloatField()
+    rate = models.FloatField(null=True)
 
     def __str__(self):
         return f"1 {self.crypto} -> {self.rate} {self.fiat}"
@@ -91,8 +90,8 @@ class ManualBalance(Balance):
         return f"{self.user}: {super().__str__()}"
 
 
-def get_user_balance(user):
-    total_balance = {}
+def get_user_balances(user):
+    total_balances = {}
     exchange_accounts = ExchangeAccount.objects.filter(user=user)
     exchange_balances = ExchangeBalance.objects.filter(exchange_account__in=exchange_accounts)
     manual_balances = ManualBalance.objects.filter(user=user)
@@ -111,16 +110,16 @@ def get_user_balance(user):
 
         if amount is None:
             continue
-        if crypto in total_balance:
-            total_balance[crypto]['amount'] += amount
-            total_balance[crypto]['amount_fiat'] += amount_fiat
+        if crypto in total_balances:
+            total_balances[crypto]['amount'] += amount
+            total_balances[crypto]['amount_fiat'] += amount_fiat
         else:
-            total_balance[crypto] = {
+            total_balances[crypto] = {
                 'amount': amount,
                 'amount_fiat': amount_fiat
             }
 
-    return total_balance
+    return total_balances
 
 
 def refresh_rates():
@@ -133,12 +132,12 @@ def refresh_rates():
         rates = cmc.get_crypto_rates(fiat.symbol)
         for crypto in cryptos:
             if crypto.symbol in rates:
-                created_rate, _ = Rate.objects.get_or_create(
+                rate, _ = Rate.objects.get_or_create(
                     crypto=crypto,
-                    fiat=fiat,
-                    rate=rates[crypto.symbol]
+                    fiat=fiat
                 )
-                created_rate.save()
+                rate.rate = rates[crypto.symbol]
+                rate.save()
 
 
 def refresh_balances():
