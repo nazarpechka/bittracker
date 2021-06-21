@@ -7,7 +7,6 @@
     {% csrf_token %}
     {% for field in fiat_form %}
       <p>
-        {{ field.label_tag }}<br>
         {{ field }}
         {% if field.help_text %}
           <small style="color: grey">{{ field.help_text }}</small>
@@ -17,9 +16,10 @@
         {% endfor %}
       </p>
     {% endfor %}
-    <button type="submit">Change</button>
+    <button type="submit" class="button w-button">Change</button>
   </form>
     <h3>Exchange accounts</h3>
+    {% if exchange_accounts %}
     <div class="table__wrapper">
         <div class="table-point">
             <div class="column">
@@ -29,7 +29,7 @@
                 <div class="title-text"><strong>API key</strong></div>
             </div>
             <div class="column">
-                <div class="title-text"><strong>Deletion</strong></div>
+                <div class="title-text"><strong>Action</strong></div>
             </div>
         </div>
         {% for account in exchange_accounts %}
@@ -38,7 +38,7 @@
                     <div class="title-text">{{ account.exchange }}</div>
                 </div>
                 <div class="column">
-                    <div class="title-text">{{ account.key }}</div>
+                    <div class="title-text">{{ account.key|slice:":16" }}...</div>
                 </div>
                 <div class="column">
                     <div class="title-text"><a href="{% url 'delete_exchange_account' pk=account.pk %}">Delete</a></div>
@@ -46,8 +46,11 @@
             </div>
         {% endfor %}
     </div>
+    {% endif %}
+    <br>
     <a href="{% url 'add_exchange_account' %}" class="button w-button">Add</a>
     <h3>Manual balances</h3>
+    {% if manual_balances %}
     <div class="table__wrapper">
         <div class="table-point">
             <div class="column">
@@ -60,7 +63,7 @@
                 <div class="title-text"><strong>Amount</strong></div>
             </div>
             <div class="column">
-                <div class="title-text"><strong>Deletion</strong></div>
+                <div class="title-text"><strong>Action</strong></div>
             </div>
         </div>
         {% for balance in manual_balances %}
@@ -80,5 +83,7 @@
             </div>
         {% endfor %}
     </div>
+    {% endif %}
+    <br>
     <a href="{% url 'add_manual_balance' %}" class="button w-button">Add</a>
 {% endblock %}

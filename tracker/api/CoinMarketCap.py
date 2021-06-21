@@ -29,6 +29,7 @@ class CoinMarketCap:
         parameters = {
             'start': '1',
             'limit': settings.COINMARKETCAP_LIMIT,
+            'sort': 'cmc_rank'
         }
         response = self.__request('/cryptocurrency/map', parameters)["data"]
         cryptos = {}
@@ -55,8 +56,11 @@ class CoinMarketCap:
         }
         response = self.__request('/cryptocurrency/listings/latest', parameters)["data"]
         rates = {}
-        for rate in response:
-            rates[rate["symbol"]] = float(rate["quote"][fiat]["price"])
+        for data in response:
+            rates[data["symbol"]] = {
+                'price': float(data["quote"][fiat]["price"]),
+                'percent_change_24h': float(data["quote"][fiat]["percent_change_24h"])
+            }
         return rates
 
 

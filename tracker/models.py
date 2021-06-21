@@ -37,6 +37,7 @@ class Rate(models.Model):
     crypto = models.ForeignKey(Crypto, on_delete=models.CASCADE)
     fiat = models.ForeignKey(Fiat, on_delete=models.CASCADE)
     rate = models.FloatField(null=True)
+    percent_change_24h = models.FloatField(null=True)
 
     def __str__(self):
         return f"1 {self.crypto} -> {self.rate} {self.fiat}"
@@ -102,11 +103,14 @@ def get_user_balances(user):
     for balance in balances:
         crypto = balance.crypto
         amount = balance.amount
+
         try:
             rate = Rate.objects.get(crypto=crypto, fiat=user_fiat)
             amount_fiat = rate.rate * amount
+            percent_change_24h = rate.percent_change_24h
         except (Rate.DoesNotExist, TypeError):
             amount_fiat = 0
+            percent_change_24h = 0
 
         if amount is None:
             continue
@@ -116,7 +120,8 @@ def get_user_balances(user):
         else:
             total_balances[crypto] = {
                 'amount': amount,
-                'amount_fiat': amount_fiat
+                'amount_fiat': amount_fiat,
+                'percent_change_24h': percent_change_24h
             }
 
     return total_balances
@@ -124,35 +129,40 @@ def get_user_balances(user):
 
 def refresh_rates():
     cmc = CoinMarketCap()
-
     fiats = Fiat.objects.all()
-    cryptos = Crypto.objects.all()
 
     for fiat in fiats:
         rates = cmc.get_crypto_rates(fiat.symbol)
-        for crypto in cryptos:
-            if crypto.symbol in rates:
-                rate, _ = Rate.objects.get_or_create(
-                    crypto=crypto,
-                    fiat=fiat
-                )
-                rate.rate = rates[crypto.symbol]
-                rate.save()
+        for symbol, data_dict in rates.items():
+            crypto, _ = Crypto.objects.get_or_create(symbol=symbol)
+            rate, _ = Rate.objects.get_or_create(
+                crypto=crypto,
+                fiat=fiat
+            )
+            rate.rate = data_dict['price']
+            rate.percent_change_24h = data_dict['percent_change_24h']
+            rate.save()
 
 
 def refresh_balances():
-    accounts = ExchangeAccount.objects.all()
+    for account in ExchangeAccount.objects.all():
+        refresh_balance(account)
 
-    for account in accounts:
-        api = APIFactory.create(account)
+
+def refresh_balance(account):
+    api = APIFactory.create(account)
+    try:
         balance = api.get_balance()
+    except TypeError:
+        print(f"Error: couldn't load balance for account - {account}, skipping")
+        return
 
-        for symbol, amount in balance.items():
-            crypto, _ = Crypto.objects.get_or_create(symbol=symbol)
-            exchange_balance, _ = ExchangeBalance.objects.get_or_create(exchange_account=account, crypto=crypto)
-            exchange_balance.amount = amount
-            exchange_balance.save()
+    for symbol, amount in balance.items():
+        crypto, _ = Crypto.objects.get_or_create(symbol=symbol)
+        exchange_balance, _ = ExchangeBalance.objects.get_or_create(exchange_account=account, crypto=crypto)
+        exchange_balance.amount = amount
+        exchange_balance.save()
 
-        for exchange_balance in ExchangeBalance.objects.all():
-            if exchange_balance.crypto.symbol not in balance:
-                exchange_balance.delete()
+    for exchange_balance in ExchangeBalance.objects.all():
+        if exchange_balance.crypto.symbol not in balance:
+            exchange_balance.delete()

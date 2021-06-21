@@ -2,19 +2,16 @@
 {% block title %} {{ user.get_username }}'s portfolio {% endblock %}
 {% block content %}
     <h2>Your Portfolio</h2>
+    {%  if not balances %}
+        <h3>It's empty here. Please add exchanges or manual balances in <a href="{% url 'settings' %}">Settings</a>.</h3>
+    {%  else %}
+    <h3>Total holdings: {{ holdings_fiat|floatformat:4}} {{ fiat_symbol }}</h3>
     <div class="container">
         <canvas id="myChart"></canvas>
     </div>
 
     <div class="table__wrapper">
-        <div class="title-block">
-            <div class="title-text"><strong>Total holdings:</strong></div>
-            <div class="_35px-hor-space"></div>
-            <div class="title-text">{{ holdings_fiat }}</div>
-            <div class="_5px-hor-space"></div>
-            <div class="title-text">{{ fiat_symbol }}</div>
-        </div>
-        <div class="table-point">
+        <div class="table-point champagne">
             <div class="column">
                 <div class="title-text"><strong>Symbol</strong></div>
             </div>
@@ -27,9 +24,12 @@
             <div class="column">
                 <div class="title-text"><strong>Amount in {{ fiat_symbol }}</strong></div>
             </div>
+            <div class="column">
+                <div class="title-text"><strong>24h change %</strong></div>
+            </div>
         </div>
         {% for crypto, data in balances.items %}
-        <div class="table-point grey">
+        <div class="table-point">
             <div class="column">
                 <div class="title-text">{{ crypto.symbol }}</div>
             </div>
@@ -41,6 +41,9 @@
             </div>
             <div class="column">
                 <div class="title-text">{{ data.amount_fiat|floatformat:4 }}</div>
+            </div>
+            <div class="column">
+                <div class="title-text">{{ data.percent_change_24h|floatformat:4 }}</div>
             </div>
         </div>
         {% endfor %}
@@ -77,4 +80,5 @@
         });
 
     </script>
+    {% endif %}
 {% endblock %}

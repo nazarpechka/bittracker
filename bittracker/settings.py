@@ -143,7 +143,7 @@ MIN_BALANCE = 0.00001
 COINMARKETCAP_URL = 'https://pro-api.coinmarketcap.com/v1'
 COINMARKETCAP_KEY = '49ebcb1f-8c83-4b07-8a1d-d5467bd845be'
 # Limit how much currencies would be loaded
-COINMARKETCAP_LIMIT = 1000
+COINMARKETCAP_LIMIT = 105
 
 # Supported exchanges
 EXCHANGES = ['Binance']

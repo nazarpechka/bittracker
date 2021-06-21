@@ -358,10 +358,13 @@
   align-items: center;
 }
 
-.table-point.grey {
-  background-color: #e6e6e6;
+.table-point.green {
+  background-color: #F3E9D2;
 }
 
+.table-point.champagne {
+  background-color: #C6DABF;
+}
 .column {
   width: 25%;
   padding: 15px;

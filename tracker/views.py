@@ -3,7 +3,7 @@ from django.contrib.auth import login as auth_login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import SignUpForm, ManualBalanceForm, ExchangeAccountForm, UserProfileFiatForm
-from .models import get_user_balances, UserProfile, ExchangeAccount, ManualBalance
+from .models import get_user_balances, UserProfile, ExchangeAccount, ManualBalance, refresh_balance
 
 
 def home(request):
@@ -15,7 +15,7 @@ def portfolio(request):
     profile = UserProfile.objects.get(user=request.user)
     fiat_symbol = profile.fiat.symbol
     balances = get_user_balances(profile)
-
+    print(balances)
     crypto_symbols = [crypto.symbol for crypto in balances.keys()]
     amounts_fiat = [amounts_dict['amount_fiat'] for amounts_dict in balances.values()]
     holdings_fiat = sum(amounts_fiat)
@@ -77,7 +77,7 @@ def add_exchange_account(request):
             account = form.save(commit=False)
             account.user = UserProfile.objects.get(user=request.user)
             account.save()
-
+            refresh_balance(account)
             return redirect('settings')
     else:
         form = ExchangeAccountForm()

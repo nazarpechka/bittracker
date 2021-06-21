@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="w-richtext">
-        <h2>Cryptocurrency portfolio tracker</h2>
-        <h3>How it works</h3>
-        <p>BitTracker allows you to follow your cryptocurrency portfolio status automatically, combining data
-            from a variety of cryptocurrency exchanges and your manual input.</p>
-        <p></p>
-        <p></p>
-        <p></p>
-    </div>
+    {% load static %}
+    <h2>Cryptocurrency portfolio tracker</h2>
+    <img src="{% static 'img/portfolio_demo.png' %}" alt="Portfolio demo" width="50%" height="50%">
+    <h3>What is BitTracker?</h3>
+    <p>BitTracker allows you to follow your cryptocurrency portfolio status automatically, combining data
+        from a variety of cryptocurrency exchanges and your manual input.</p>
+    <h3>Track your current balance</h3>
+    <p>You can see your current investments value in a fiat currency of choice, with pretty and
+        informative graphs and real-time data on prices from CoinMarketCap.</p>
+    <h3>How to start</h3>
+    <p>To start using the app, press the "Login" button, then press "Don't have an account?" button.
+        There you should provide your actual information, and then you can start using the app by
+        providing API keys to exchanges or manually inputting your crypto holdings.</p>
+
 {% endblock %}
